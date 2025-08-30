@@ -1,5 +1,9 @@
+"""
+Flask server for emotion detection API.
+This module provides a web interface for analyzing emotions in text.
+"""
 
-from flask import Flask, request, jsonify, render_template 
+from flask import Flask, request, render_template
 from EmotionDetection import emotion_detector
 
 app = Flask(__name__)
@@ -13,10 +17,13 @@ def emotion_detector_route():
     """
     # Get the text from the query parameter
     text_to_analyze = request.args.get('textToAnalyze')
-    
     # Analyze the emotion
     result = emotion_detector(text_to_analyze)
-    
+
+    # Handle error response: Check if the dominant_emotion in the dict is None
+    if result['dominant_emotion'] is None:
+        return "Invalid text! Please try again!"
+
     # Format the response string as required
     response_text = (
         f"For the given statement, the system response is "

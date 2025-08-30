@@ -1,7 +1,18 @@
 # emotion_detection.py
 import requests
 import json
+from typing import Dict, Optional
 
+def get_empty_emotion_dict() -> Dict[str, Optional[float]]:
+    """Returns an emotion dictionary with all values set to None."""
+    return {
+        'anger': None,
+        'disgust': None,
+        'fear': None,
+        'joy': None,
+        'sadness': None,
+        'dominant_emotion': None
+    }
 def emotion_detector(text_to_analyze):
     """
     This function sends the text to the Watson NLP Emotion Predict function
@@ -9,7 +20,8 @@ def emotion_detector(text_to_analyze):
     """
     # Check for empty string first to avoid unnecessary request
     if not text_to_analyze.strip():
-        return None
+         return get_empty_emotion_dict()
+
         
     # The URL, headers, and input JSON as provided
     url = 'https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/NlpService/EmotionPredict'
@@ -19,6 +31,9 @@ def emotion_detector(text_to_analyze):
     # Send the POST request
     response = requests.post(url, json=input_json, headers=headers)
     
+    # *** KEY REQUIREMENT: Check status_code attribute ***
+    if response.status_code == 400:
+        return get_empty_emotion_dict()
      # Convert the response text to a Python dictionary
     response_dict = json.loads(response.text)
     
@@ -44,4 +59,3 @@ def emotion_detector(text_to_analyze):
     }
     
 
- 
